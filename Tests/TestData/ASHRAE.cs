@@ -2,6 +2,7 @@
 using System.IO.BACnet.EventNotification;
 using System.IO.BACnet.EventNotification.EventValues;
 using System.IO.BACnet.Serialize;
+using System.IO.BACnet.Serialize.Decode;
 using System.Linq;
 using System.Text;
 using static System.IO.BACnet.Tests.Helper;
@@ -124,6 +125,53 @@ namespace System.IO.BACnet.Tests.TestData
             }, false);
         }
 
+        public static (EventInformation Object, byte[] EncodedBytes) F_1_8_PayloadOnly()
+        {
+            return (new EventInformation(new[]
+                {
+                    new EventSummary(
+                        new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_INPUT, 2),
+                        BacnetEventStates.EVENT_STATE_HIGH_LIMIT,
+                        BitString.Parse("011"),
+                        new TimeStamp[]
+                        {
+                            new Time(15, 35, 00, 20),
+                            Time.Any,
+                            Time.Any,
+                        },
+                        BacnetNotifyTypes.NOTIFY_ALARM,
+                        BitString.Parse("111"),
+                        new uint[] {15, 15, 20}
+                    ),
+                    new EventSummary
+                    (
+                        new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_INPUT, 3),
+                        BacnetEventStates.EVENT_STATE_NORMAL,
+                        BitString.Parse("110"),
+                        new TimeStamp[]
+                        {
+                            new Time(15, 40, 0, 0),
+                            Time.Any,
+                            new Time(15, 45, 30, 30),
+                        },
+                        BacnetNotifyTypes.NOTIFY_ALARM,
+                        BitString.Parse("111"),
+                        new uint[] {15, 15, 20}
+                    )
+                }, false),
+
+                // example taken from ANNEX F - Examples of APDU Encoding - F.1.8
+                new byte[]
+                {
+                    0x0E, 0x0C, 0x00, 0x00, 0x00, 0x02, 0x19, 0x03, 0x2A, 0x05, 0x60, 0x3E, 0x0C,
+                    0x0F, 0x23, 0x00, 0x14, 0x0C, 0xFF, 0xFF, 0xFF, 0xFF, 0x0C, 0xFF, 0xFF, 0xFF, 0xFF, 0x3F, 0x49,
+                    0x00, 0x5A, 0x05, 0xE0, 0x6E, 0x21, 0x0F, 0x21, 0x0F, 0x21, 0x14, 0x6F, 0x0C, 0x00, 0x00, 0x00,
+                    0x03, 0x19, 0x00, 0x2A, 0x05, 0xC0, 0x3E, 0x0C, 0x0F, 0x28, 0x00, 0x00, 0x0C, 0xFF, 0xFF, 0xFF,
+                    0xFF, 0x0C, 0x0F, 0x2D, 0x1E, 0x1E, 0x3F, 0x49, 0x00, 0x5A, 0x05, 0xE0, 0x6E, 0x21, 0x0F, 0x21,
+                    0x0F, 0x21, 0x14, 0x6F, 0x0F, 0x19, 0x00
+                });
+        }
+
         public static (uint SubscriberProcessIdentifier, BacnetObjectId MonitoredObjectIdentifier, bool
             CancellationRequest, bool IssueConfirmedNotifications, uint Lifetime)
             F_1_10()
@@ -219,6 +267,78 @@ namespace System.IO.BACnet.Tests.TestData
                     })
             };
 
+        public static (List<BacnetReadAccessSpecification> Input, byte[] ExpectedBytes)
+            F_3_7_Multiple()
+            => (new List<BacnetReadAccessSpecification>
+                {
+                    new BacnetReadAccessSpecification(new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_INPUT, 33),
+                        new List<BacnetPropertyReference>
+                        {
+                            new BacnetPropertyReference(BacnetPropertyIds.PROP_PRESENT_VALUE)
+                        }),
+                    new BacnetReadAccessSpecification(new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_INPUT, 50),
+                        new List<BacnetPropertyReference>
+                        {
+                            new BacnetPropertyReference(BacnetPropertyIds.PROP_PRESENT_VALUE)
+                        }),
+                    new BacnetReadAccessSpecification(new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_INPUT, 35),
+                        new List<BacnetPropertyReference>
+                        {
+                            new BacnetPropertyReference(BacnetPropertyIds.PROP_PRESENT_VALUE)
+                        })
+                }, // example taken from ANNEX F - Examples of APDU Encoding - F.3.7
+                new byte[]
+                {
+                    0x00, 0x04, 0x02, 0x0E, 0x0C, 0x00, 0x00, 0x00, 0x21, 0x1E, 0x09, 0x55, 0x1F, 0x0C, 0x00, 0x00,
+                    0x00, 0x32, 0x1E, 0x09, 0x55, 0x1F, 0x0C, 0x00, 0x00, 0x00, 0x23, 0x1E, 0x09, 0x55, 0x1F
+                });
+
+        public static (IList<BacnetReadAccessResult> Input, byte[] ExpectedBytes) F_3_7_Multiple_Ack()
+            => (new List<BacnetReadAccessResult>
+                {
+                    new BacnetReadAccessResult(new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_INPUT, 33),
+                        new List<BacnetPropertyValue>
+                        {
+                            new BacnetPropertyValue
+                            {
+                                property = new BacnetPropertyReference(BacnetPropertyIds.PROP_PRESENT_VALUE),
+                                value = new List<BacnetValue> {new BacnetValue(42.3f)},
+                            }
+                        }),
+
+                    new BacnetReadAccessResult(new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_INPUT, 50),
+                        new List<BacnetPropertyValue>
+                        {
+                            new BacnetPropertyValue
+                            {
+                                property = new BacnetPropertyReference(BacnetPropertyIds.PROP_PRESENT_VALUE),
+                                value = new List<BacnetValue>
+                                {
+                                    new BacnetValue(new BacnetError(BacnetErrorClasses.ERROR_CLASS_OBJECT,
+                                        BacnetErrorCodes.ERROR_CODE_UNKNOWN_OBJECT))
+                                },
+                            }
+                        }),
+
+                    new BacnetReadAccessResult(new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_INPUT, 35),
+                        new List<BacnetPropertyValue>
+                        {
+                            new BacnetPropertyValue
+                            {
+                                property = new BacnetPropertyReference(BacnetPropertyIds.PROP_PRESENT_VALUE),
+                                value = new List<BacnetValue> {new BacnetValue(435.7f)},
+                            }
+                        })
+                },
+                // example taken from ANNEX F - Examples of APDU Encoding - F.3.7
+                new byte[]
+                {
+                    0x30, 0x02, 0x0E, 0x0C, 0x00, 0x00, 0x00, 0x21, 0x1E, 0x29, 0x55, 0x4E, 0x44, 0x42, 0x29, 0x33,
+                    0x33, 0x4F, 0x1F, 0x0C, 0x00, 0x00, 0x00, 0x32, 0x1E, 0x29, 0x55, 0x5E, 0x91, 0x01, 0x91, 0x1F,
+                    0x5F, 0x1F, 0x0C, 0x00, 0x00, 0x00, 0x23, 0x1E, 0x29, 0x55, 0x4E, 0x44, 0x43, 0xD9, 0xD9, 0x9A,
+                    0x4F, 0x1F
+                });
+
         public static (BacnetObjectId ObjectId, BacnetPropertyIds PropertyId, BacnetReadRangeRequestTypes RequestType,
             uint Position, DateTime Time, int Count, uint ArrayIndex)
             F_3_8()
@@ -270,5 +390,33 @@ namespace System.IO.BACnet.Tests.TestData
 
         public static (int LowLimit, int HighLimit) F_4_9()
             => (3, 3);
+
+        public static string GenerateCode()
+        {
+            return Doc2Code(@"
+X'00' PDU Type=0 (BACnet-Confirmed-Request-PDU, SEG=0, MOR=0, SA=0)
+X'04' Maximum APDU Size Accepted=1024 octets
+X'02' Invoke ID=2
+X'0E' Service Choice=14 (ReadPropertyMultiple-Request)
+X'0C' SD Context Tag 0 (Object Identifier, L=4)
+X'00000021' Analog Input, Instance Number=33
+X'1E' PD Opening Tag 1 (List Of Property References)
+X'09' SD Context Tag 0 (Property Identifier, L=1)
+X'55' 85 (PRESENT_VALUE)
+X'1F' PD Closing Tag 1 (List Of Property References)
+X'0C' SD Context Tag 0 (Object Identifier, L=4)
+X'00000032' Analog Input, Instance Number=50
+X'1E' PD Opening Tag 1 (List Of Property References)
+X'09' SD Context Tag 0 (Property Identifier, L=1)
+X'55' 85 (PRESENT_VALUE)
+X'1F' PD Closing Tag 1 (List Of Property References)
+X'0C' SD Context Tag 0 (Object Identifier, L=4)
+X'00000023' Analog Input, Instance Number=35
+X'1E' PD Opening Tag 1 (List Of Property References)
+X'09' SD Context Tag 0 (Property Identifier, L=1)
+X'55' 85 (PRESENT_VALUE)
+X'1F' PD Closing Tag 1 (List Of Property References)
+");
+        }
     }
 }

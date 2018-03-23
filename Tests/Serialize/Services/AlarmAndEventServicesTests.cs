@@ -2,6 +2,7 @@
 using System.IO.BACnet.EventNotification;
 using System.IO.BACnet.EventNotification.EventValues;
 using System.IO.BACnet.Serialize;
+using System.IO.BACnet.Serialize.Decode;
 using System.IO.BACnet.Tests.TestData;
 using System.Linq;
 using NUnit.Framework;
@@ -397,7 +398,6 @@ namespace System.IO.BACnet.Tests.Serialize
         {
             // arrange
             var buffer = new EncodeBuffer();
-
             var data = ASHRAE.F_1_8();
 
             // example taken from ANNEX F - Examples of APDU Encoding - F.1.8
@@ -423,23 +423,11 @@ namespace System.IO.BACnet.Tests.Serialize
         }
 
         [Test]
-        public void should_decode_eventinformation_after_encode()
+        public void should_decode_eventinformation_according_to_ashrae_example()
         {
-            // arrange
-            var buffer = new EncodeBuffer();
-            var input = ASHRAE.F_1_8();
-            IList<BacnetGetEventInformationData> output = new List<BacnetGetEventInformationData>();
-
             // act
-            AlarmAndEventServices.EncodeGetEventInformationAcknowledge(buffer, input.Data, input.MoreEvents);
-            var encodedBytes = buffer.ToArray();
-            AlarmAndEventServices.DecodeEventInformation(encodedBytes, 0, encodedBytes.Length, ref output, out var moreEvents);
-
-            // assert
-            Assert.That(moreEvents, Is.EqualTo(input.MoreEvents));
-            Assert.That(output.Count, Is.EqualTo(2));
-            Helper.AssertPropertiesAndFieldsAreEqual(input.Data[0], output[0]);
-            Helper.AssertPropertiesAndFieldsAreEqual(input.Data[1], output[1]);
+            Helper.RunDecoderTest(ASHRAE.F_1_8_PayloadOnly,
+                Decoder.Standard.AlarmAndEventServices.DecodeGetEventInformationAck);
         }
 
         [Test]

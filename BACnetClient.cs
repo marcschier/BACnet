@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.BACnet.EventNotification;
-using System.IO.BACnet.EventNotification.EventValues;
 using System.IO.BACnet.Serialize;
+using System.IO.BACnet.Serialize.Decode;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Logging;
+using ObjectAccessServices = System.IO.BACnet.Serialize.ObjectAccessServices;
 
 namespace System.IO.BACnet
 {
@@ -44,6 +46,8 @@ namespace System.IO.BACnet
         public bool ForceWindowSize { get; set; }
         public bool DefaultSegmentationHandling { get; set; } = true;
         public ILog Log { get; set; } = LogManager.GetLogger<BacnetClient>();
+
+        public Func<BacnetAddress, Decoder> DecoderResolver = address => Decoder.Standard;
 
         /// <summary>
         /// Used as the number of tentatives
@@ -239,8 +243,11 @@ namespace System.IO.BACnet
                 }
                 else if (service == BacnetConfirmedServices.SERVICE_CONFIRMED_READ_PROP_MULTIPLE && OnReadPropertyMultipleRequest != null)
                 {
-                    if (ObjectAccessServices.DecodeReadPropertyMultiple(buffer, offset, length, out var properties) >= 0)
-                        OnReadPropertyMultipleRequest(this, address, invokeId, properties, maxSegments);
+                    var result = DecoderResolver(address).ObjectAccessServices
+                        .DecodeReadPropertyMultiple(new Context(buffer, offset));
+
+                    if (result != null)
+                        OnReadPropertyMultipleRequest(this, address, invokeId, result.Value, maxSegments);
                     else
                     {
                         ErrorResponse(address, service, invokeId, BacnetErrorClasses.ERROR_CLASS_SERVICES, BacnetErrorCodes.ERROR_CODE_ABORT_OTHER);
@@ -1074,27 +1081,24 @@ namespace System.IO.BACnet
                     BacnetReadRangeRequestTypes.RR_BY_POSITION, idxBegin, DateTime.Now, (int)quantity, ASN1.BACNET_ARRAY_ALL), waitForTransmit);
         }
 
-        public void EndReadRangeRequest(BacnetAsyncResult request, out byte[] trendBuffer, out uint itemCount)
+        public void EndReadRangeRequest(BacnetAsyncResult request, out ReadRangeResult result)
         {
             using (request)
             {
-                var result = request.GetResult(TimeSpan.FromSeconds(40), Retries, r =>
+                result = request.GetResult(TimeSpan.FromSeconds(40), Retries, r =>
                 {
-                    var itemCountValue = ObjectAccessServices.DecodeReadRangeAcknowledge(r.Result, 0, r.Result.Length, out var trendBufferValue);
-                    if (itemCountValue == 0)
-                        throw new Exception("Failed to decode ReadRangeAcknowledge");
-                    return Tuple.Create(itemCountValue, trendBufferValue);
-                });
+                    var readRangeResult = DecoderResolver(r.Address).ObjectAccessServices
+                        .DecodeReadRangeAck(new Context(r.Result, 0));
 
-                itemCount = result.Item1;
-                trendBuffer = result.Item2;
+                    return readRangeResult.Value;
+                });
             }
         }
 
-        public void ReadRangeRequest(BacnetAddress address, BacnetObjectId objectId, uint idxBegin, ref uint quantity, out byte[] range)
+        public void ReadRangeRequest(BacnetAddress address, BacnetObjectId objectId, uint idxBegin, uint quantity, out ReadRangeResult result)
         {
             using (var asyncResult = BeginReadRangeRequest(address, objectId, idxBegin, quantity, true))
-                EndReadRangeRequest(asyncResult, out range, out quantity); // quantity read could be less than demanded
+                EndReadRangeRequest(asyncResult, out result); // quantity read could be less than demanded
         }
 
         public void SubscribeCOVRequest(BacnetAddress address, BacnetObjectId objectId, uint subscribeId, bool cancel, bool issueConfirmedNotifications, uint lifetime)
@@ -1280,14 +1284,16 @@ namespace System.IO.BACnet
             {
                 return request.GetResult(Timeout, Retries, r =>
                 {
-                    var byteCount =
-                        ObjectAccessServices.DecodeReadPropertyMultipleAcknowledge(
-                            r.Address, r.Result, 0, r.Result.Length, out var values);
+                    var sw = Stopwatch.StartNew();
+                    var result = DecoderResolver(r.Address).ObjectAccessServices
+                        .DecodeReadPropertyMultipleAck(new Context(r.Result, 0));
 
-                    if (byteCount < 0)
+                    Debug.WriteLine($"DecodeReadPropertyMultipleAck took {sw.ElapsedMilliseconds}ms");
+
+                    if (result.Length < 0)
                         throw new Exception("Failed to decode ReadPropertyMultipleAcknowledge");
 
-                    return values;
+                    return result.Value;
                 });
             }
         }
@@ -1428,24 +1434,25 @@ namespace System.IO.BACnet
                 return EndGetAlarmSummaryRequest(request);
         }
 
-        public IList<BacnetGetEventInformationData> GetEventsRequest(BacnetAddress address)
+        public IList<EventSummary> GetEventsRequest(BacnetAddress address)
         {
-            var events = new List<BacnetGetEventInformationData>();
+            var events = new List<EventSummary>();
 
             while (true)
             {
-                var lastEventObjectId = events.Count > 0 ? events.Last().objectIdentifier : default(BacnetObjectId?);
+                var lastEventObjectId = events.Count > 0 ? events.Last().ObjectId : default(BacnetObjectId?);
                 using (var request = BeginGetEventsRequest(address, lastEventObjectId, true))
                 {
-                    events.AddRange(EndGetEventsRequest(request, out var moreEvents));
-                    if (!moreEvents) break;
+                    var result = EndGetEventsRequest(request);
+                    events.AddRange(result.EventSummaries);
+                    if (!result.MoreEvents) break;
                 }
             }
 
             return events;
         }
 
-        public Task<IList<BacnetGetEventInformationData>> GetEventsAsync(BacnetAddress address)
+        public Task<IList<EventSummary>> GetEventsAsync(BacnetAddress address)
         {
             return CallAsync(() => GetEventsRequest(address), $"Failed to get events from {address}");
         }
@@ -1477,20 +1484,17 @@ namespace System.IO.BACnet
             }
         }
 
-        public IList<BacnetGetEventInformationData> EndGetEventsRequest(BacnetAsyncResult request, out bool moreEvents)
+        public EventInformation EndGetEventsRequest(BacnetAsyncResult request)
         {
             using (request)
             {
-                var result = request.GetResult(Timeout, Retries, r =>
+                return request.GetResult(Timeout, Retries, r =>
                 {
-                    IList<BacnetGetEventInformationData> events = new List<BacnetGetEventInformationData>();
-                    if (AlarmAndEventServices.DecodeEventInformation(r.Result, 0, r.Result.Length, ref events, out var moreEventsValue) < 0)
-                        throw new Exception("Failed to decode Events");
-                    return Tuple.Create(events, moreEventsValue);
-                });
+                    var eventInformationResult = DecoderResolver(r.Address).AlarmAndEventServices
+                        .DecodeGetEventInformationAck(new Context(r.Result, 0));
 
-                moreEvents = result.Item2;
-                return result.Item1;
+                    return eventInformationResult.Value;
+                });
             }
         }
 

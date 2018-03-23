@@ -3,6 +3,7 @@ namespace System.IO.BACnet
     [Flags]
     public enum BacnetStatusFlags
     {
+        NONE = 0,
         STATUS_FLAG_IN_ALARM = 1,
         STATUS_FLAG_FAULT = 2,
         STATUS_FLAG_OVERRIDDEN = 4,

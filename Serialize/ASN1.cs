@@ -2,8 +2,9 @@
 using System.IO.BACnet.Base;
 using System.IO.BACnet.EventNotification;
 using System.IO.BACnet.EventNotification.EventValues;
+using System.IO.BACnet.Serialize.Decode;
 using System.Text;
-using Microsoft.Win32;
+using Decoder = System.IO.BACnet.Serialize.Decode.Decoder;
 
 namespace System.IO.BACnet.Serialize
 {
@@ -1025,13 +1026,13 @@ namespace System.IO.BACnet.Serialize
         {
             var len = 0;
 
-            value = new BacnetReadAccessResult();
+            value = null;
 
             if (!decode_is_context_tag(buffer, offset + len, 0))
                 return -1;
             len = 1;
             len += decode_object_id(buffer, offset + len, out BacnetObjectTypes type, out var instance);
-            value.objectIdentifier = new BacnetObjectId(type, instance);
+            var oid = new BacnetObjectId(type, instance);
 
             /* Tag 1: listOfResults */
             if (!decode_is_opening_tag_number(buffer, offset + len, 1))
@@ -1075,7 +1076,7 @@ namespace System.IO.BACnet.Serialize
                     while (!decode_is_closing_tag_number(buffer, offset + len, 4))
                     {
                         tagLen = bacapp_decode_application_data(address, buffer, offset + len, apdu_len + offset - 1,
-                            value.objectIdentifier.Type, (BacnetPropertyIds)new_entry.property.propertyIdentifier, out var v);
+                            oid.Type, (BacnetPropertyIds)new_entry.property.propertyIdentifier, out var v);
                         if (tagLen < 0) return -1;
                         len += tagLen;
                         localValueList.Add(v);
@@ -1111,12 +1112,13 @@ namespace System.IO.BACnet.Serialize
 
                 valueList.Add(new_entry);
             }
-            value.values = valueList;
+            
+            value = new BacnetReadAccessResult(oid, valueList);
 
             return len;
         }
 
-        public static int decode_read_access_specification(byte[] buffer, int offset, int apduLen, out BacnetReadAccessSpecification value)
+        public static int _decode_read_access_specification(byte[] buffer, int offset, int apduLen, out BacnetReadAccessSpecification value)
         {
             var len = 0;
 
@@ -2108,10 +2110,12 @@ namespace System.IO.BACnet.Serialize
                 //this seems to be a strange way to determine object encodings
                 if (propertyId == BacnetPropertyIds.PROP_LIST_OF_GROUP_MEMBERS)
                 {
-                    tagLen = decode_read_access_specification(buffer, offset, maxOffset, out var v);
+                    var result = Decoder.Standard.ObjectAccessServices.DecodeReadPropertyMultiple(new Context(buffer, offset));
+
+                    tagLen = result.Length;
                     if (tagLen < 0) return -1;
                     value.Tag = BacnetApplicationTags.BACNET_APPLICATION_TAG_READ_ACCESS_SPECIFICATION;
-                    value.Value = v;
+                    value.Value = result.Value;
                     return tagLen;
                 }
                 if (propertyId == BacnetPropertyIds.PROP_ACTIVE_COV_SUBSCRIPTIONS)

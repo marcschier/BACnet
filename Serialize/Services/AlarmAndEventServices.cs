@@ -699,7 +699,8 @@ namespace System.IO.BACnet.Serialize
             ASN1.encode_context_boolean(buffer, 1, moreEvents);
         }
 
-        public static int DecodeEventInformation(byte[] buffer, int offset, int apduLen, ref IList<BacnetGetEventInformationData> events, out bool moreEvent)
+        [Obsolete]
+        public static int _DecodeEventInformation(byte[] buffer, int offset, int apduLen, ref IList<BacnetGetEventInformationData> events, out bool moreEvent)
         {
             var len = 1; // tag 0
 

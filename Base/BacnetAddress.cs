@@ -20,6 +20,12 @@ namespace System.IO.BACnet
             type = addressType;
             net = network;
             adr = address;
+
+            if (type != BacnetAddressTypes.None || adr == null)
+                return;
+
+            if (adr.Length == 6)
+                type = BacnetAddressTypes.IP;
         }
 
         public BacnetAddress(BacnetAddressTypes addressType, string address = null, ushort network = 0)
@@ -62,7 +68,7 @@ namespace System.IO.BACnet
 
         public override string ToString()
         {
-            return ToString(type);
+            return $"[{type}]" + ToString(type);
         }
 
         public string ToString(BacnetAddressTypes addressType)

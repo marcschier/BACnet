@@ -131,7 +131,7 @@ namespace System.IO.BACnet.Serialize
                 return -1;
             len++;
 
-            var linkedPropertyValues = new LinkedList<BacnetPropertyValue>();
+            var linkedPropertyValues = new List<BacnetPropertyValue>();
             while (apduLen - len > 1)
             {
                 var newEntry = new BacnetPropertyValue();
@@ -174,7 +174,7 @@ namespace System.IO.BACnet.Serialize
                 else
                     return -1;
 
-                linkedPropertyValues.AddLast(newEntry);
+                linkedPropertyValues.Add(newEntry);
             }
 
             /* Closing tag 1 - List of Properties */
@@ -373,7 +373,8 @@ namespace System.IO.BACnet.Serialize
             EncodeReadPropertyMultiple(buffer, new[] { new BacnetReadAccessSpecification(objectId, properties) });
         }
 
-        public static int DecodeReadPropertyMultiple(byte[] buffer, int offset, int apduLen, out IList<BacnetReadAccessSpecification> properties)
+        [Obsolete]
+        public static int _DecodeReadPropertyMultiple(byte[] buffer, int offset, int apduLen, out IList<BacnetReadAccessSpecification> properties)
         {
             var len = 0;
 
@@ -382,7 +383,7 @@ namespace System.IO.BACnet.Serialize
 
             while (apduLen - len > 0)
             {
-                var tmp = ASN1.decode_read_access_specification(buffer, offset + len, apduLen - len, out var value);
+                var tmp = ASN1._decode_read_access_specification(buffer, offset + len, apduLen - len, out var value);
                 if (tmp < 0) return -1;
                 len += tmp;
                 values.Add(value);
@@ -398,7 +399,8 @@ namespace System.IO.BACnet.Serialize
                 ASN1.encode_read_access_result(buffer, value);
         }
 
-        public static int DecodeReadPropertyMultipleAcknowledge(BacnetAddress address, byte[] buffer, int offset, int apduLen, out IList<BacnetReadAccessResult> values)
+        [Obsolete]
+        public static int _DecodeReadPropertyMultipleAcknowledge(BacnetAddress address, byte[] buffer, int offset, int apduLen, out IList<BacnetReadAccessResult> values)
         {
             var len = 0;
 
@@ -567,16 +569,8 @@ namespace System.IO.BACnet.Serialize
             }
         }
 
-        /*
-         * TODO FIXME: this implementation is incomplete - and wrong. I'll only patch it up to pass my test-case
-         *
-         * It should:
-         *  - return the decoded values
-         *  - further decode the item data (since the type of the data is not known, a hook has to be provided)
-         *  - handle the (optional) sequence-number - which can only be done (cleanly) if we know the byte-count
-         *    of item data; so the hook has to provide that!
-         */
-        public static uint DecodeReadRangeAcknowledge(byte[] buffer, int offset, int apduLen, out byte[] rangeBuffer)
+        [Obsolete]
+        public static uint _DecodeReadRangeAcknowledge(byte[] buffer, int offset, int apduLen, out byte[] rangeBuffer)
         {
             var len = 0;
             rangeBuffer = null;

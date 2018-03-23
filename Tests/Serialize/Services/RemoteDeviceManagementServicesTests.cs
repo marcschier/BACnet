@@ -452,22 +452,5 @@ namespace System.IO.BACnet.Tests.Serialize
             // assert
             Assert.That(encodedBytes, Is.EquivalentTo(expectedBytes));
         }
-
-        [Test]
-        public void GenerateCode()
-        {
-            Console.WriteLine(Doc2Code(@"
-X'10' PDU Type=1 (Unconfirmed-Service-Request-PDU)
-X'00' Service Choice=0 (I-Am-Request)
-X'C4' Application Tag 12 (Object Identifier, L=4) (I-Am Device Identifier)
-X'02000004' Device, Instance Number=4
-X'21' Application Tag 2 (Unsigned Integer, L=1) (Max APDU Length Accepted)
-X'80' 128
-X'91' Application Tag 9 (Enumerated, L=1) (Segmentation Supported)
-X'00' 0 (SEGMENTED_BOTH)
-X'21' Application Tag 2 (Unsigned Integer, L=1) (Vendor ID)
-X'42' 66
-"));
-        }
     }
 }
