@@ -28,5 +28,15 @@ namespace System.IO.BACnet.Tests.TestData
                 new DeviceObjectReference(new BacnetObjectId(BacnetObjectTypes.OBJECT_LIFE_SAFETY_ZONE, 454)),
 
                 new byte[] {0x1C, 0x05, 0x80, 0x01, 0xC6});
+
+        public static (EventInformation Object, byte[] EncodedBytes) EmptyEventInformation()
+        {
+            return (new EventInformation(new EventSummary[0], false),
+
+                new byte[]
+                {
+                    0x0E, 0x0F, 0x19, 0x00
+                });
+        }
     }
 }

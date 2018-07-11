@@ -431,6 +431,14 @@ namespace System.IO.BACnet.Tests.Serialize
         }
 
         [Test]
+        public void should_decode_eventinformation_whenempty()
+        {
+            // act
+            Helper.RunDecoderTest(Field.EmptyEventInformation,
+                Decoder.Standard.AlarmAndEventServices.DecodeGetEventInformationAck);
+        }
+
+        [Test]
         public void should_encode_lifesafetyoperation_according_to_ashrae_example()
         {
             // arrange

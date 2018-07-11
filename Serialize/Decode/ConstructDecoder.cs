@@ -171,7 +171,7 @@ namespace System.IO.BACnet.Serialize.Decode
                 }
 
                 return results;
-            }, contextTag, false);
+            }, contextTag, false) ?? new Result<IList<T>>(new List<T>(), 0);
         }
 
         public Result<IList<T>> DecodeArray<T>(Context context, DecodingFunctionDelegate<T> method, byte? contextTag = null, int? expectedCount = null)
