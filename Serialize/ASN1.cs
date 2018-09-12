@@ -496,6 +496,9 @@ namespace System.IO.BACnet.Serialize
                         throw new ArgumentException("Value has to be array of 7 of daily schedule ");
                     }
                     break;
+                case BacnetApplicationTags.BACNET_APPLICATION_TAG_SPECIAL_EVENT:
+                    ((BacnetSpecialEvent)value.Value).Encode(buffer);
+                    break;
                 default:
                     //context specific
                     if (value.Value is byte[] arr)
@@ -2057,6 +2060,14 @@ namespace System.IO.BACnet.Serialize
                     }
                     value.Value = schedule;
                     value.Tag = BacnetApplicationTags.BACNET_APPLICATION_TAG_WEEKLY_SCHEDULE;
+                    return len;
+                }
+                if(propertyId == BacnetPropertyIds.PROP_EXCEPTION_SCHEDULE)
+                {
+                    var excpSched = new BacnetSpecialEvent();
+                    len +=excpSched.Decode(buffer, offset + len, (uint)maxOffset);
+                    value.Value = excpSched;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_TAG_SPECIAL_EVENT;
                     return len;
                 }
 

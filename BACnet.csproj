@@ -58,6 +58,7 @@
     <Compile Include="Base\BacnetAddressTypes.cs" />
     <Compile Include="Base\BacnetApplicationTags.cs" />
     <Compile Include="Base\BacnetBinaryPv.cs" />
+    <Compile Include="Base\BacnetSpecialEvent.cs" />
     <Compile Include="Base\BacnetDailySchedule.cs" />
     <Compile Include="Base\BacnetProgramError.cs" />
     <Compile Include="Base\BacnetProgramRequest.cs" />
