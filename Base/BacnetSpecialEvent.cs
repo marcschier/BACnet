@@ -8,6 +8,9 @@ namespace System.IO.BACnet
 {
     public struct BacnetSpecialEvent : ASN1.IEncode, ASN1.IDecode
     {
+        /// <summary>
+        /// has to be BacnetCalendarEntry or BacnetObjectId(Calendar)
+        /// </summary>
         public object Period { set; get; }
 
        /* public bool IsCalendarEntry;
@@ -79,6 +82,7 @@ namespace System.IO.BACnet
             }
             else if(Period is BacnetObjectId)
             {
+                if (((BacnetObjectId)Period).Type != BacnetObjectTypes.OBJECT_CALENDAR) throw new Exception("Period Object is not an calendar");
                 ASN1.encode_bacnet_object_id(buffer, ((BacnetObjectId)Period).Type, ((BacnetObjectId)Period).Instance);
             }
 
@@ -98,11 +102,7 @@ namespace System.IO.BACnet
 
 
         }
-
-        public override string ToString()
-        {
-            return "";
-        }
+        
 
     }
 }
