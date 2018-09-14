@@ -484,20 +484,24 @@ namespace System.IO.BACnet.Serialize
                     }
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_WEEKLY_SCHEDULE:
-                    if(value.Value is BacnetDailySchedule[] dayArr && dayArr.Length == 7)
+                    if(value.Value is BacnetDailySchedule daySched )
                     {
-                        for (int i = 0; i < 7; i++)
-                        {
-                            dayArr[i].Encode(buffer);
-                        }
+                        daySched.Encode(buffer);
                     }
                     else
                     {
-                        throw new ArgumentException("Value has to be array of 7 of daily schedule ");
+                        throw new ArgumentException("value has to be typeof BacnetDailySchedule");
                     }
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_SPECIAL_EVENT:
-                    ((BacnetSpecialEvent)value.Value).Encode(buffer);
+                    if(value.Value is BacnetSpecialEvent specEvent)
+                    {
+                        specEvent.Encode(buffer);
+                    }
+                    else
+                    {
+                        throw new Exception("value has to be typeof BacnetSpecialEvent");
+                    }
                     break;
                 default:
                     //context specific
@@ -2052,12 +2056,14 @@ namespace System.IO.BACnet.Serialize
                 if(propertyId == BacnetPropertyIds.PROP_WEEKLY_SCHEDULE)
                 {
                     //has to be an array of 7
-                    var schedule = new BacnetDailySchedule[7];                    
+                    /*var schedule = new BacnetDailySchedule[7];                    
                     for (int i = 0; i < 7; i++)
                     {
                         schedule[i] = new BacnetDailySchedule();
                         len += schedule[i].Decode(buffer, offset + len, (uint)maxOffset);
-                    }
+                    }*/
+                    var schedule = new BacnetDailySchedule();
+                    len += schedule.Decode(buffer, offset + len, (uint)maxOffset);
                     value.Value = schedule;
                     value.Tag = BacnetApplicationTags.BACNET_APPLICATION_TAG_WEEKLY_SCHEDULE;
                     return len;

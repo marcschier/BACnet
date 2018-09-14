@@ -71,7 +71,7 @@ namespace System.IO.BACnet
             byte periodType;
             if (Period is BACnetCalendarEntry) periodType = 0;
             else if (Period is BacnetObjectId) periodType = 1;
-            else throw new Exception("unsupported period type");
+            else throw new Exception("BacnetSpecialEvent - unsupported period type -> has to be BacnetCalendarEntry or BacnetObjectId");
 
             ASN1.encode_opening_tag(buffer, periodType);
 
