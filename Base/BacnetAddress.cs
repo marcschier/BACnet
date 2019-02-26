@@ -118,7 +118,7 @@ namespace System.IO.BACnet
 
         public string ToString(bool sourceOnly)
         {
-            if (RoutedSource == null) 
+            if (RoutedSource == null)
                 return ToString();
 
             return sourceOnly

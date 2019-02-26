@@ -1,12 +1,12 @@
 ﻿/**************************************************************************
 *                           MIT License
-* 
+*
 * Copyright (C) 2015 Frederic Chaxel <fchaxel@free.fr>
 *
 * lot of code ported from https://github.com/LorenVS/bacstack
 *      Copyright (C) 2014 Loren Van Spronsen, thank to him.
 * Thank to Christopher Gunther for the idea, and the starting code
-* 
+*
 * Permission is hereby granted, free of charge, to any person obtaining
 * a copy of this software and associated documentation files (the
 * "Software"), to deal in the Software without restriction, including
@@ -39,10 +39,10 @@ namespace System.IO.BACnet
 {
     // A reference to PacketDotNet.dll & SharpPcap.dll should be made
     // in order to use this code
-    // This class is not in the file BacnetTransport.cs to avoid integration 
+    // This class is not in the file BacnetTransport.cs to avoid integration
     // of two dll when Bacnet/Ethernet is not used
 
-    internal class BacnetEthernetProtocolTransport : BacnetTransportBase
+    public class BacnetEthernetProtocolTransport : BacnetTransportBase
     {
         private LibPcapLiveDevice _device;
         private byte[] _deviceMac; // Mac of the device
