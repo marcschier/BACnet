@@ -983,9 +983,9 @@ namespace System.IO.BACnet.Serialize
                     /* Tag 5: Error */
                     var err = new BacnetError();
                     len += decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
-                    len += EnumUtils.DecodeEnumerated(buffer, offset + len, lenValueType, out err.error_class);
+                    len += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValueType, out err.error_class);
                     len += decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
-                    len += EnumUtils.DecodeEnumerated(buffer, offset + len, lenValueType, out err.error_code);
+                    len += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValueType, out err.error_code);
                     if (!decode_is_closing_tag_number(buffer, offset + len, 5))
                         return -1;
                     len++;
@@ -1082,7 +1082,7 @@ namespace System.IO.BACnet.Serialize
             if (tagNumber != 1)
                 return -1;
 
-            len += EnumUtils.DecodeEnumerated(buffer, offset + len, lenValueType, out value.propertyIdentifier);
+            len += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValueType, out value.propertyIdentifier);
 
             /* Tag 2: Optional Array Index */
             var tagLen = decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
@@ -2386,19 +2386,19 @@ namespace System.IO.BACnet.Serialize
                     break;
 
                 case BacnetPropertyState.BacnetPropertyStateTypes.BINARY_VALUE:
-                    sectionLength = EnumUtils.DecodeEnumerated(buffer, offset + len, lenValueType, out value.state.binaryValue);
+                    sectionLength = EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValueType, out value.state.binaryValue);
                     if (sectionLength == -1)
                         return -1;
                     break;
 
                 case BacnetPropertyState.BacnetPropertyStateTypes.EVENT_TYPE:
-                    sectionLength = EnumUtils.DecodeEnumerated(buffer, offset + len, lenValueType, out value.state.eventType);
+                    sectionLength = EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValueType, out value.state.eventType);
                     if (sectionLength == -1)
                         return -1;
                     break;
 
                 case BacnetPropertyState.BacnetPropertyStateTypes.STATE:
-                    sectionLength = EnumUtils.DecodeEnumerated(buffer, offset + len, lenValueType, out value.state.state);
+                    sectionLength = EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValueType, out value.state.state);
                     if (sectionLength == -1)
                         return -1;
                     break;

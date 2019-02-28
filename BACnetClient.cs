@@ -1112,49 +1112,17 @@ namespace System.IO.BACnet
 
         public void EndSubscribeCOVRequest(BacnetAsyncResult request) => EndConfirmedServiceRequest(request);
 
-        public void SubscribePropertyRequest(BacnetAddress address, BacnetObjectId objectId, BacnetPropertyReference monitoredProperty, uint subscribeId, bool cancel, bool issueConfirmedNotifications)
-        {
-            using (var asyncResult = BeginSubscribePropertyRequest(address, objectId, monitoredProperty, subscribeId, cancel, issueConfirmedNotifications, true))
+        public void SubscribePropertyRequest(BacnetAddress address, BacnetObjectId objectId, BacnetPropertyReference monitoredProperty, uint subscribeId, bool cancel, bool issueConfirmedNotifications, uint lifetime = 0, float? covIncrement = null) {
+            using (var asyncResult = BeginSubscribePropertyRequest(address, objectId, monitoredProperty, subscribeId, cancel, issueConfirmedNotifications, true, lifetime, covIncrement))
                 EndSubscribePropertyRequest(asyncResult);
         }
 
-        public BacnetAsyncResult BeginSubscribePropertyRequest(BacnetAddress address, BacnetObjectId objectId, BacnetPropertyReference monitoredProperty, uint subscribeId, bool cancel, bool issueConfirmedNotifications, bool waitForTransmit)
+        public BacnetAsyncResult BeginSubscribePropertyRequest(BacnetAddress address, BacnetObjectId objectId, BacnetPropertyReference monitoredProperty, uint subscribeId, bool cancel, bool issueConfirmedNotifications, bool waitForTransmit, uint lifetime = 0, float? covIncrement = null)
         {
             Log.Debug($"Sending SubscribePropertyRequest {objectId}.{monitoredProperty}");
             return BeginConfirmedServiceRequest(address, BacnetConfirmedServices.SERVICE_CONFIRMED_SUBSCRIBE_COV_PROPERTY,
-                buffer => Services.EncodeSubscribeProperty(buffer, subscribeId, objectId, cancel, issueConfirmedNotifications, 0, monitoredProperty, false, 0f), waitForTransmit);
+                buffer => Services.EncodeSubscribeProperty(buffer, subscribeId, objectId, cancel, issueConfirmedNotifications, lifetime, monitoredProperty, covIncrement != null, covIncrement ?? 0f), waitForTransmit);
         }
-
-        // public bool SubscribePropertyRequest(BacnetAddress adr, BacnetObjectId objectId, BacnetPropertyReference monitoredProperty, uint subscribeId, bool cancel, bool issueConfirmedNotifications, byte invokeId = 0, uint lifetime = 0, float? covIncrement = null)
-       // {
-       //     using (var result = (BacnetAsyncResult)BeginSubscribePropertyRequest(adr, objectId, monitoredProperty, subscribeId, cancel, issueConfirmedNotifications, true, invokeId, lifetime, covIncrement))
-       //     {
-       //         for (var r = 0; r < _retries; r++)
-       //         {
-       //             if (result.WaitForDone(Timeout))
-       //             {
-       //                 EndSubscribePropertyRequest(result, out var ex);
-       //                 if (ex != null)
-       //                     throw ex;
-       //                 return true;
-       //             }
-       //             if (r < Retries - 1)
-       //                 result.Resend();
-       //         }
-       //     }
-       //     return false;
-       // }
-       //
-       // public IAsyncResult BeginSubscribePropertyRequest(BacnetAddress adr, BacnetObjectId objectId, BacnetPropertyReference monitoredProperty, uint subscribeId, bool cancel, bool issueConfirmedNotifications, bool waitForTransmit, byte invokeId = 0, uint lifetime = 0, float? covIncrement = null)
-       // {
-       //     Log.Debug($"Sending SubscribePropertyRequest {objectId}.{monitoredProperty}");
-       //     if (invokeId == 0)
-       //         invokeId = unchecked(_invokeId++);
-       //
-       //     var buffer = GetEncodeBuffer(Transport.HeaderLength);
-       //     NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource);
-       //     APDU.EncodeConfirmedServiceRequest(buffer, PduConfirmedServiceRequest(), BacnetConfirmedServices.SERVICE_CONFIRMED_SUBSCRIBE_COV_PROPERTY, MaxSegments, Transport.MaxAdpuLength, invokeId);
-       //     Services.EncodeSubscribeProperty(buffer, subscribeId, objectId, cancel, issueConfirmedNotifications, lifetime, monitoredProperty, covIncrement != null, covIncrement ?? 0f);
 
         public void EndSubscribePropertyRequest(BacnetAsyncResult request) => EndConfirmedServiceRequest(request);
 

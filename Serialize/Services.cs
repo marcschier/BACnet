@@ -837,7 +837,7 @@ namespace System.IO.BACnet.Serialize
             if (ASN1.decode_is_context_tag(buffer, offset + len, 6))
             {
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out lenValue);
-                len += EnumUtils.DecodeEnumerated<BacnetEventTypes>(buffer, offset + len, lenValue, out var eventTypeValue);
+                len += EnumClassUtils<Enum>.DecodeEnumerated<BacnetEventTypes>(buffer, offset + len, lenValue, out var eventTypeValue);
                 decodedStateTransition.Add(e => e.EventType = eventTypeValue);
                 eventType = eventTypeValue;
             }
@@ -857,7 +857,7 @@ namespace System.IO.BACnet.Serialize
             if (ASN1.decode_is_context_tag(buffer, offset + len, 8))
             {
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out lenValue);
-                len += EnumUtils.DecodeEnumerated<BacnetNotifyTypes>(buffer, offset + len, lenValue, out var notifyTypeValue);
+                len += EnumClassUtils<Enum>.DecodeEnumerated<BacnetNotifyTypes>(buffer, offset + len, lenValue, out var notifyTypeValue);
                 decodedStateTransition.Add(e => e.NotifyType = notifyTypeValue);
                 notifyType = notifyTypeValue;
             }
@@ -1017,10 +1017,10 @@ namespace System.IO.BACnet.Serialize
                     break;
 
                 case BacnetEventTypes.EVENT_CHANGE_OF_LIFE_SAFETY:
-                    len += EnumUtils.DecodeContextEnumerated(buffer, offset + len, 0, out BacnetLifeSafetyStates lifeSafetyNewState);
-                    len += EnumUtils.DecodeContextEnumerated(buffer, offset + len, 1, out BacnetLifeSafetyModes lifeSafetyNewMode);
+                    len += EnumClassUtils<Enum>.DecodeContextEnumerated(buffer, offset + len, 0, out BacnetLifeSafetyStates lifeSafetyNewState);
+                    len += EnumClassUtils<Enum>.DecodeContextEnumerated(buffer, offset + len, 1, out BacnetLifeSafetyModes lifeSafetyNewMode);
                     len += ASN1.decode_context_bitstring(buffer, offset + len, 2, out var lifeSafetyStatusFlags);
-                    len += EnumUtils.DecodeContextEnumerated(buffer, offset + len, 3, out BacnetLifeSafetyOperations operationExpected);
+                    len += EnumClassUtils<Enum>.DecodeContextEnumerated(buffer, offset + len, 3, out BacnetLifeSafetyOperations operationExpected);
                     eventValues = new ChangeOfLifeSafety
                     {
                         NewState = lifeSafetyNewState,
@@ -1087,9 +1087,6 @@ namespace System.IO.BACnet.Serialize
 
                 case BacnetEventTypes.EVENT_CHANGE_OF_TIMER:
                     break; // TODO
-
-                default:
-                    return -1;
 
                 default:
                     return false;
@@ -1275,7 +1272,7 @@ namespace System.IO.BACnet.Serialize
                 value.objectIdentifier = new BacnetObjectId(type, instance);
 
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
-                len += EnumUtils.DecodeEnumerated(buffer, offset + len, lenValue, out value.eventState);
+                len += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValue, out value.eventState);
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
                 len += ASN1.decode_bitstring(buffer, offset + len, lenValue, out value.acknowledgedTransitions);
 
@@ -1301,7 +1298,7 @@ namespace System.IO.BACnet.Serialize
                 len++;  // closing Tag 3
 
                     len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
-                    len += EnumUtils.DecodeEnumerated(buffer, offset + len, lenValue, out value.notifyType);
+                    len += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValue, out value.notifyType);
                     len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
                     len += ASN1.decode_bitstring(buffer, offset + len, lenValue, out value.eventEnable);
 
@@ -1333,7 +1330,7 @@ namespace System.IO.BACnet.Serialize
                 len += ASN1.decode_object_id(buffer, offset + len, out BacnetObjectTypes type, out var instance);
                 value.objectIdentifier = new BacnetObjectId(type, instance);
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
-                len += EnumUtils.DecodeEnumerated(buffer, offset + len, lenValue, out value.alarmState);
+                len += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValue, out value.alarmState);
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
                 len += ASN1.decode_bitstring(buffer, offset + len, lenValue, out value.acknowledgedTransitions);
 
@@ -1501,7 +1498,7 @@ namespace System.IO.BACnet.Serialize
             if (!ASN1.decode_is_context_tag(buffer, offset + len, 0))
                 return -1;
             len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out var lenValueType);
-            len += EnumUtils.DecodeEnumerated(buffer, offset + len, lenValueType, out state);
+            len += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValueType, out state);
             /* Tag 1: password - optional */
             if (len < apduLen)
             {
@@ -2502,10 +2499,10 @@ namespace System.IO.BACnet.Serialize
 
             offset += ASN1.decode_tag_number_and_value(buffer, offset, out _, out var lenValueType);
             /* FIXME: we could validate that the tag is enumerated... */
-            offset += EnumUtils.DecodeEnumerated(buffer, offset, lenValueType, out errorClass);
+            offset += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset, lenValueType, out errorClass);
             offset += ASN1.decode_tag_number_and_value(buffer, offset, out _, out lenValueType);
             /* FIXME: we could validate that the tag is enumerated... */
-            offset += EnumUtils.DecodeEnumerated(buffer, offset, lenValueType, out errorCode);
+            offset += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset, lenValueType, out errorCode);
 
             return offset - orgOffset;
         }
