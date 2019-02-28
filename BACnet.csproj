@@ -2,30 +2,26 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Company>Yabe</Company>
+    <Company>Ela-compil sp. z o. o.</Company>
     <Product>BACnet</Product>
     <Authors>Morten Kvistgaard, Ela-compil</Authors>
-    <Copyright>Copyright © Morten Kvistgaard 2015, MIT License</Copyright>
-    <PackageTags>fce4c8e3-0d3a-4d90-9c26-349177129433</PackageTags>
-    <PackageProjectUrl>https://github.com/ela-compil/BACnet</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/ela-compil/BACnet/master/logo.png</PackageIconUrl>
-    <PackageReleaseNotes>BACnet protocol library for .NET</PackageReleaseNotes>
-    <RootNamespace>System.IO.BACnet</RootNamespace>
+    <Copyright>Copyright (c) 2017 Jakub Bartkowiak, MIT License</Copyright>
     <Version>8.0.30703</Version>
+    <LangVersion>7.1</LangVersion>
+    <Description>BACnet protocol library for .NET</Description>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="packages\**" />
+    <Compile Remove="Tests\**" />
+    <EmbeddedResource Remove="packages\**" />
+    <EmbeddedResource Remove="Tests\**" />
+    <None Remove="packages\**" />
+    <None Remove="Tests\**" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Common.Logging" Version="3.4.1" />
     <PackageReference Include="Common.Logging.Core" Version="3.4.1" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
-    <PackageReference Include="PacketDotNet" Version="0.16.0" />
-    <PackageReference Include="SharpPcap" Version="4.4.0" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.IO.Ports" Version="4.5.0" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="PacketDotNet" Version="0.19.3" />
     <PackageReference Include="SharpPcap" Version="4.5.0" />
   </ItemGroup>
