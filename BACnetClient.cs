@@ -1267,9 +1267,9 @@ namespace System.IO.BACnet
             res.Dispose();
         }
 
-        public bool SubscribePropertyRequest(BacnetAddress adr, BacnetObjectId objectId, BacnetPropertyReference monitoredProperty, uint subscribeId, bool cancel, bool issueConfirmedNotifications, byte invokeId = 0)
+        public bool SubscribePropertyRequest(BacnetAddress adr, BacnetObjectId objectId, BacnetPropertyReference monitoredProperty, uint subscribeId, bool cancel, bool issueConfirmedNotifications, byte invokeId = 0, uint lifetime = 0, float? covIncrement = null)
         {
-            using (var result = (BacnetAsyncResult)BeginSubscribePropertyRequest(adr, objectId, monitoredProperty, subscribeId, cancel, issueConfirmedNotifications, true, invokeId))
+            using (var result = (BacnetAsyncResult)BeginSubscribePropertyRequest(adr, objectId, monitoredProperty, subscribeId, cancel, issueConfirmedNotifications, true, invokeId, lifetime, covIncrement))
             {
                 for (var r = 0; r < _retries; r++)
                 {
@@ -1287,7 +1287,7 @@ namespace System.IO.BACnet
             return false;
         }
 
-        public IAsyncResult BeginSubscribePropertyRequest(BacnetAddress adr, BacnetObjectId objectId, BacnetPropertyReference monitoredProperty, uint subscribeId, bool cancel, bool issueConfirmedNotifications, bool waitForTransmit, byte invokeId = 0)
+        public IAsyncResult BeginSubscribePropertyRequest(BacnetAddress adr, BacnetObjectId objectId, BacnetPropertyReference monitoredProperty, uint subscribeId, bool cancel, bool issueConfirmedNotifications, bool waitForTransmit, byte invokeId = 0, uint lifetime = 0, float? covIncrement = null)
         {
             Log.Debug($"Sending SubscribePropertyRequest {objectId}.{monitoredProperty}");
             if (invokeId == 0)
@@ -1296,7 +1296,7 @@ namespace System.IO.BACnet
             var buffer = GetEncodeBuffer(Transport.HeaderLength);
             NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource);
             APDU.EncodeConfirmedServiceRequest(buffer, PduConfirmedServiceRequest(), BacnetConfirmedServices.SERVICE_CONFIRMED_SUBSCRIBE_COV_PROPERTY, MaxSegments, Transport.MaxAdpuLength, invokeId);
-            Services.EncodeSubscribeProperty(buffer, subscribeId, objectId, cancel, issueConfirmedNotifications, 0, monitoredProperty, false, 0f);
+            Services.EncodeSubscribeProperty(buffer, subscribeId, objectId, cancel, issueConfirmedNotifications, lifetime, monitoredProperty, covIncrement != null, covIncrement ?? 0f);
 
             //send
             var ret = new BacnetAsyncResult(this, adr, invokeId, buffer.buffer, buffer.offset - Transport.HeaderLength, waitForTransmit, TransmitTimeout);
@@ -2365,7 +2365,7 @@ namespace System.IO.BACnet
 
         /// <summary>
         /// Handle the segmentation of several too hugh response (if it's accepted by the client) 
-        /// used by ReadRange, ReadProperty, ReadPropertyMultiple & ReadFile responses
+        /// used by ReadRange, ReadProperty, ReadPropertyMultiple &amp; ReadFile responses
         /// </summary>
         private void HandleSegmentationResponse(BacnetAddress adr, byte invokeId, Segmentation segmentation, Action<Segmentation> transmit)
         {
@@ -2459,7 +2459,7 @@ namespace System.IO.BACnet
                 }
 
                 //increment before ack can do so (race condition)
-                unchecked { segmentation.sequence_number++; };
+                unchecked { segmentation.sequence_number++; }
             }
 
             //send

@@ -951,6 +951,48 @@ namespace System.IO.BACnet.Serialize
                             len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out eventData.unsignedRange_exceededLimit);
                             break;
 
+                        case BacnetEventTypes.EVENT_ACCESS_EVENT:
+                            break; // TODO
+
+                        case BacnetEventTypes.EVENT_DOUBLE_OUT_OF_RANGE:
+                            len += ASN1.decode_context_double(buffer, offset + len, 0, out eventData.doubleOutOfRange_exceedingValue);
+                            len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.doubleOutOfRange_statusFlags);
+                            len += ASN1.decode_context_double(buffer, offset + len, 2, out eventData.doubleOutOfRange_deadband);
+                            len += ASN1.decode_context_double(buffer, offset + len, 2, out eventData.doubleOutOfRange_exceededLimit);
+                            break;
+
+                        case BacnetEventTypes.EVENT_SIGNED_OUT_OF_RANGE:
+                            len += ASN1.decode_context_signed(buffer, offset + len, 0, out eventData.signedOutOfRange_exceedingValue);
+                            len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.signedOutOfRange_statusFlags);
+                            len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out eventData.signedOutOfRange_deadband);
+                            len += ASN1.decode_context_signed(buffer, offset + len, 2, out eventData.signedOutOfRange_exceededLimit);
+                            break;
+
+                        case BacnetEventTypes.EVENT_UNSIGNED_OUT_OF_RANGE:
+                            len += ASN1.decode_context_unsigned(buffer, offset + len, 0, out eventData.unsignedOutOfRange_exceedingValue);
+                            len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.unsignedOutOfRange_statusFlags);
+                            len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out eventData.unsignedOutOfRange_deadband);
+                            len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out eventData.unsignedOutOfRange_exceededLimit);
+                            break;
+
+                        case BacnetEventTypes.EVENT_CHANGE_OF_CHARACTER_STRING:
+                            len += ASN1.decode_context_character_string(buffer, offset + len, 20000, 0, out eventData.changeOfCharacterString_changedValue);
+                            len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.changeOfCharacterString_statusFlags);
+                            len += ASN1.decode_context_character_string(buffer, offset + len, 20000, 2, out eventData.changeOfCharacterString_alarmValue);
+                            break;
+
+                        case BacnetEventTypes.EVENT_CHANGE_OF_STATUS_FLAGS:
+                            break; // TODO
+
+                        case BacnetEventTypes.EVENT_CHANGE_OF_RELIABILITY:
+                            break; // TODO
+
+                        case BacnetEventTypes.EVENT_CHANGE_OF_DISCRETE_VALUE:
+                            break; // TODO
+
+                        case BacnetEventTypes.EVENT_CHANGE_OF_TIMER:
+                            break; // TODO
+
                         default:
                             return -1;
                     }
@@ -1140,7 +1182,7 @@ namespace System.IO.BACnet.Serialize
         // FChaxel
         public static int DecodeAlarmSummaryOrEvent(byte[] buffer, int offset, int apduLen, bool getEvent, ref IList<BacnetGetEventInformationData> alarms, out bool moreEvent)
         {
-            var len = 0; ;
+            var len = 0;
 
             if (getEvent)
                 len++;  // peut être tag 0
