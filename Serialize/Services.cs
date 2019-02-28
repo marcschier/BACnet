@@ -1046,35 +1046,58 @@ namespace System.IO.BACnet.Serialize
                     };
                     break;
 
-              //  case BacnetEventTypes.EVENT_ACCESS_EVENT:
-              //      break; // TODO
-              //
-              //  case BacnetEventTypes.EVENT_DOUBLE_OUT_OF_RANGE:
-              //      len += ASN1.decode_context_double(buffer, offset + len, 0, out eventData.doubleOutOfRange_exceedingValue);
-              //      len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.doubleOutOfRange_statusFlags);
-              //      len += ASN1.decode_context_double(buffer, offset + len, 2, out eventData.doubleOutOfRange_deadband);
-              //      len += ASN1.decode_context_double(buffer, offset + len, 2, out eventData.doubleOutOfRange_exceededLimit);
-              //      break;
-              //
-              //  case BacnetEventTypes.EVENT_SIGNED_OUT_OF_RANGE:
-              //      len += ASN1.decode_context_signed(buffer, offset + len, 0, out eventData.signedOutOfRange_exceedingValue);
-              //      len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.signedOutOfRange_statusFlags);
-              //      len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out eventData.signedOutOfRange_deadband);
-              //      len += ASN1.decode_context_signed(buffer, offset + len, 2, out eventData.signedOutOfRange_exceededLimit);
-              //      break;
-              //
-              //  case BacnetEventTypes.EVENT_UNSIGNED_OUT_OF_RANGE:
-              //      len += ASN1.decode_context_unsigned(buffer, offset + len, 0, out eventData.unsignedOutOfRange_exceedingValue);
-              //      len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.unsignedOutOfRange_statusFlags);
-              //      len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out eventData.unsignedOutOfRange_deadband);
-              //      len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out eventData.unsignedOutOfRange_exceededLimit);
-              //      break;
-              //
-              //  case BacnetEventTypes.EVENT_CHANGE_OF_CHARACTER_STRING:
-              //      len += ASN1.decode_context_character_string(buffer, offset + len, 20000, 0, out eventData.changeOfCharacterString_changedValue);
-              //      len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.changeOfCharacterString_statusFlags);
-              //      len += ASN1.decode_context_character_string(buffer, offset + len, 20000, 2, out eventData.changeOfCharacterString_alarmValue);
-              //      break;
+                case BacnetEventTypes.EVENT_ACCESS_EVENT:
+                    break; // TODO
+              
+                case BacnetEventTypes.EVENT_DOUBLE_OUT_OF_RANGE:
+                    len += ASN1.decode_context_double(buffer, offset + len, 0, out var doubleOutOfRange_exceedingValue);
+                    len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out var doubleOutOfRange_statusFlags);
+                    len += ASN1.decode_context_double(buffer, offset + len, 2, out var doubleOutOfRange_deadband);
+                    len += ASN1.decode_context_double(buffer, offset + len, 3, out var doubleOutOfRange_exceededLimit);
+                    eventValues = new DoubleOutOfRange {
+                        ExceedingValue = doubleOutOfRange_exceedingValue,
+                        StatusFlags = doubleOutOfRange_statusFlags,
+                        Deadband = doubleOutOfRange_deadband,
+                        ExceededLimit = doubleOutOfRange_exceededLimit
+                    };
+                    break;
+              
+                case BacnetEventTypes.EVENT_SIGNED_OUT_OF_RANGE:
+                    len += ASN1.decode_context_signed(buffer, offset + len, 0, out var signedOutOfRange_exceedingValue);
+                    len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out var signedOutOfRange_statusFlags);
+                    len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out var signedOutOfRange_deadband);
+                    len += ASN1.decode_context_signed(buffer, offset + len, 3, out var signedOutOfRange_exceededLimit);
+                    eventValues = new SignedOutOfRange {
+                        ExceedingValue = signedOutOfRange_exceedingValue,
+                        StatusFlags = signedOutOfRange_statusFlags,
+                        Deadband = signedOutOfRange_deadband,
+                        ExceededLimit = signedOutOfRange_exceededLimit
+                    };
+                    break;
+              
+                case BacnetEventTypes.EVENT_UNSIGNED_OUT_OF_RANGE:
+                    len += ASN1.decode_context_unsigned(buffer, offset + len, 0, out var unsignedOutOfRange_exceedingValue);
+                    len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out var unsignedOutOfRange_statusFlags);
+                    len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out var unsignedOutOfRange_deadband);
+                    len += ASN1.decode_context_unsigned(buffer, offset + len, 3, out var unsignedOutOfRange_exceededLimit);
+                    eventValues = new UnsignedOutOfRange {
+                        ExceedingValue = unsignedOutOfRange_exceedingValue,
+                        StatusFlags = unsignedOutOfRange_statusFlags,
+                        Deadband = unsignedOutOfRange_deadband,
+                        ExceededLimit = unsignedOutOfRange_exceededLimit
+                    };
+                    break;
+              
+                case BacnetEventTypes.EVENT_CHANGE_OF_CHARACTER_STRING:
+                    len += ASN1.decode_context_character_string(buffer, offset + len, 20000, 0, out var changeOfCharacterString_changedValue);
+                    len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out var changeOfCharacterString_statusFlags);
+                    len += ASN1.decode_context_character_string(buffer, offset + len, 20000, 2, out var changeOfCharacterString_alarmValue);
+                    eventValues = new ChangeOfCharacterString {
+                        ChangedValue = changeOfCharacterString_changedValue,
+                        StatusFlags = changeOfCharacterString_statusFlags,
+                        AlarmValue = changeOfCharacterString_alarmValue
+                    };
+                    break;
 
                 case BacnetEventTypes.EVENT_CHANGE_OF_STATUS_FLAGS:
                     break; // TODO
