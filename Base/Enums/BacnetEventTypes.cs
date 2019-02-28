@@ -14,6 +14,18 @@
         EVENT_EXTENDED = 9,
         EVENT_BUFFER_READY = 10,
         EVENT_UNSIGNED_RANGE = 11,
+        /*  (12), -- enumeration value 12 is reserved for future addenda */
+        EVENT_ACCESS_EVENT = 13,
+        EVENT_DOUBLE_OUT_OF_RANGE = 14,
+        EVENT_SIGNED_OUT_OF_RANGE = 15,
+        EVENT_UNSIGNED_OUT_OF_RANGE = 16,
+        EVENT_CHANGE_OF_CHARACTER_STRING = 17,
+        EVENT_CHANGE_OF_STATUS_FLAGS = 18,
+        EVENT_CHANGE_OF_RELIABILITY = 19,
+        EVENT_NONE = 20,
+        EVENT_CHANGE_OF_DISCRETE_VALUE = 21,
+        EVENT_CHANGE_OF_TIMER = 22,
+
         /* Enumerated values 0-63 are reserved for definition by ASHRAE.  */
         /* Enumerated values 64-65535 may be used by others subject to  */
         /* the procedures and constraints described in Clause 23.  */

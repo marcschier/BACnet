@@ -74,12 +74,44 @@ namespace System.IO.BACnet
         public BacnetDeviceObjectPropertyReference bufferReady_bufferProperty;
         public uint bufferReady_previousNotification;
         public uint bufferReady_currentNotification;
+
         /*
          ** EVENT_UNSIGNED_RANGE
          */
         public uint unsignedRange_exceedingValue;
         public BacnetBitString unsignedRange_statusFlags;
         public uint unsignedRange_exceededLimit;
+
+        /*
+         ** EVENT_DOUBLE_OUT_OF_RANGE
+         */
+        public double doubleOutOfRange_exceedingValue;
+        public BacnetBitString doubleOutOfRange_statusFlags;
+        public double doubleOutOfRange_deadband;
+        public double doubleOutOfRange_exceededLimit;
+
+        /*
+         ** EVENT_SIGNED_OUT_OF_RANGE
+         */
+        public int signedOutOfRange_exceedingValue;
+        public BacnetBitString signedOutOfRange_statusFlags;
+        public uint signedOutOfRange_deadband;
+        public int signedOutOfRange_exceededLimit;
+
+        /*
+         ** EVENT_UNSIGNED_OUT_OF_RANGE
+         */
+        public uint unsignedOutOfRange_exceedingValue;
+        public BacnetBitString unsignedOutOfRange_statusFlags;
+        public uint unsignedOutOfRange_deadband;
+        public uint unsignedOutOfRange_exceededLimit;
+
+        /*
+         ** EVENT_CHANGE_OF_CHARACTER_STRING
+         */
+        public string changeOfCharacterString_changedValue;
+        public BacnetBitString changeOfCharacterString_statusFlags;
+        public string changeOfCharacterString_alarmValue;
 
         public override string ToString()
         {
@@ -112,8 +144,7 @@ namespace System.IO.BACnet
 
                 case BacnetEventTypes.EVENT_CHANGE_OF_LIFE_SAFETY:
                     return $"newState: {changeOfLifeSafety_newState}, newMode: {changeOfLifeSafety_newMode}, "
-                           +
-                           $"statusFlags: {changeOfLifeSafety_statusFlags}, operationExpected: {changeOfLifeSafety_operationExpected}";
+                           + $"statusFlags: {changeOfLifeSafety_statusFlags}, operationExpected: {changeOfLifeSafety_operationExpected}";
 
                 case BacnetEventTypes.EVENT_BUFFER_READY:
                     return $"bufferProperty: {bufferReady_bufferProperty}, previousNotification: {bufferReady_previousNotification}, "
@@ -122,6 +153,22 @@ namespace System.IO.BACnet
                 case BacnetEventTypes.EVENT_UNSIGNED_RANGE:
                     return $"exceedingValue: {unsignedRange_exceedingValue}, statusFlags: {unsignedRange_statusFlags}, "
                            + $"exceededLimit: {unsignedRange_exceededLimit}";
+
+                case BacnetEventTypes.EVENT_SIGNED_OUT_OF_RANGE:
+                    return $"exceedingValue: {signedOutOfRange_exceedingValue}, statusFlags: {signedOutOfRange_statusFlags}, "
+                           + $"deadband: {signedOutOfRange_deadband}, exceededLimit: {signedOutOfRange_exceededLimit}";
+
+                case BacnetEventTypes.EVENT_DOUBLE_OUT_OF_RANGE:
+                    return $"exceedingValue: {doubleOutOfRange_exceedingValue}, statusFlags: {doubleOutOfRange_statusFlags}, "
+                           + $"deadband: {doubleOutOfRange_deadband}, exceededLimit: {doubleOutOfRange_exceededLimit}";
+
+                case BacnetEventTypes.EVENT_UNSIGNED_OUT_OF_RANGE:
+                    return $"exceedingValue: {unsignedOutOfRange_exceedingValue}, statusFlags: {unsignedOutOfRange_statusFlags}, "
+                           + $"deadband: {unsignedOutOfRange_deadband}, exceededLimit: {unsignedOutOfRange_exceededLimit}";
+
+                case BacnetEventTypes.EVENT_CHANGE_OF_CHARACTER_STRING:
+                    return $"newState: {changeOfCharacterString_changedValue}, statusFlags: {changeOfCharacterString_statusFlags},  "
+                           + $"alarm: {changeOfCharacterString_alarmValue}";
 
                 default:
                     return null;

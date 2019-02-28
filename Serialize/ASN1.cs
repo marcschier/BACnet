@@ -2442,7 +2442,7 @@ namespace System.IO.BACnet.Serialize
        
         public static int decode_context_unsigned(byte[] buffer, int offset, byte tagNumber, out uint value)
         {
-            if (!decode_is_context_tag(buffer, offset, tagNumber) || decode_is_closing_tag(buffer, offset))
+            if (!decode_is_context_tag(buffer, offset, tagNumber) || decode_is_closing_tag(buffer, offset)) 
             {
                 value = 0;
                 return -1;
@@ -2450,6 +2450,30 @@ namespace System.IO.BACnet.Serialize
 
             var len = decode_tag_number_and_value(buffer, offset, out _, out var lenValue);
             return len + decode_unsigned(buffer, offset + len, lenValue, out value);
+        }
+
+        public static int decode_context_double(byte[] buffer, int offset, byte tagNumber, out double value) 
+        {
+            if (!decode_is_context_tag(buffer, offset, tagNumber) || decode_is_closing_tag(buffer, offset))
+            {
+                value = 0;
+                return -1;
+            }
+
+            var len = decode_tag_number_and_value(buffer, offset, out _, out var lenValue);
+            return len + decode_double_safe(buffer, offset + len, lenValue, out value);
+        }
+
+        public static int decode_context_signed(byte[] buffer, int offset, byte tagNumber, out int value)
+        {
+            if (!decode_is_context_tag(buffer, offset, tagNumber) || decode_is_closing_tag(buffer, offset))
+            {
+                value = 0;
+                return -1;
+            }
+
+            var len = decode_tag_number_and_value(buffer, offset, out _, out var lenValue);
+            return len + decode_signed(buffer, offset + len, lenValue, out value);
         }
     }
 }

@@ -1046,36 +1046,50 @@ namespace System.IO.BACnet.Serialize
                     };
                     break;
 
-//              case BacnetEventTypes.EVENT_FLOATING_LIMIT:
-//                  len += ASN1.decode_context_real(buffer, offset + len, 0, out eventData.floatingLimit_referenceValue);
-//                  len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.floatingLimit_statusFlags);
-//                  len += ASN1.decode_context_real(buffer, offset + len, 2, out eventData.floatingLimit_setPointValue);
-//                  len += ASN1.decode_context_real(buffer, offset + len, 3, out eventData.floatingLimit_errorLimit);
-//                  break;
-// 
-//              case BacnetEventTypes.EVENT_OUT_OF_RANGE:
-//                  len += ASN1.decode_context_real(buffer, offset + len, 0, out eventData.outOfRange_exceedingValue);
-//                  len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.outOfRange_statusFlags);
-//                  len += ASN1.decode_context_real(buffer, offset + len, 2, out eventData.outOfRange_deadband);
-//                  len += ASN1.decode_context_real(buffer, offset + len, 3, out eventData.outOfRange_exceededLimit);
-//                  break;
-// 
-//              case BacnetEventTypes.EVENT_CHANGE_OF_LIFE_SAFETY:
-//                  len += ASN1.decode_context_enumerated(buffer, offset + len, 0, out eventData.changeOfLifeSafety_newState);
-//                  len += ASN1.decode_context_enumerated(buffer, offset + len, 1, out eventData.changeOfLifeSafety_newMode);
-//                  len += ASN1.decode_context_bitstring(buffer, offset + len, 2, out eventData.changeOfLifeSafety_statusFlags);
-//                  len += ASN1.decode_context_enumerated(buffer, offset + len, 3, out eventData.changeOfLifeSafety_operationExpected);
-//                  break;
-// 
-//              case BacnetEventTypes.EVENT_BUFFER_READY:
-//                  // Too lazy for this one and not sure if really needed, somebody want to do it ? :)
-//                  break;
-// 
-//              case BacnetEventTypes.EVENT_UNSIGNED_RANGE:
-//                  len += ASN1.decode_context_unsigned(buffer, offset + len, 0, out eventData.unsignedRange_exceedingValue);
-//                  len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.unsignedRange_statusFlags);
-//                  len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out eventData.unsignedRange_exceededLimit);
-//                  break;
+              //  case BacnetEventTypes.EVENT_ACCESS_EVENT:
+              //      break; // TODO
+              //
+              //  case BacnetEventTypes.EVENT_DOUBLE_OUT_OF_RANGE:
+              //      len += ASN1.decode_context_double(buffer, offset + len, 0, out eventData.doubleOutOfRange_exceedingValue);
+              //      len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.doubleOutOfRange_statusFlags);
+              //      len += ASN1.decode_context_double(buffer, offset + len, 2, out eventData.doubleOutOfRange_deadband);
+              //      len += ASN1.decode_context_double(buffer, offset + len, 2, out eventData.doubleOutOfRange_exceededLimit);
+              //      break;
+              //
+              //  case BacnetEventTypes.EVENT_SIGNED_OUT_OF_RANGE:
+              //      len += ASN1.decode_context_signed(buffer, offset + len, 0, out eventData.signedOutOfRange_exceedingValue);
+              //      len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.signedOutOfRange_statusFlags);
+              //      len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out eventData.signedOutOfRange_deadband);
+              //      len += ASN1.decode_context_signed(buffer, offset + len, 2, out eventData.signedOutOfRange_exceededLimit);
+              //      break;
+              //
+              //  case BacnetEventTypes.EVENT_UNSIGNED_OUT_OF_RANGE:
+              //      len += ASN1.decode_context_unsigned(buffer, offset + len, 0, out eventData.unsignedOutOfRange_exceedingValue);
+              //      len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.unsignedOutOfRange_statusFlags);
+              //      len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out eventData.unsignedOutOfRange_deadband);
+              //      len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out eventData.unsignedOutOfRange_exceededLimit);
+              //      break;
+              //
+              //  case BacnetEventTypes.EVENT_CHANGE_OF_CHARACTER_STRING:
+              //      len += ASN1.decode_context_character_string(buffer, offset + len, 20000, 0, out eventData.changeOfCharacterString_changedValue);
+              //      len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out eventData.changeOfCharacterString_statusFlags);
+              //      len += ASN1.decode_context_character_string(buffer, offset + len, 20000, 2, out eventData.changeOfCharacterString_alarmValue);
+              //      break;
+
+                case BacnetEventTypes.EVENT_CHANGE_OF_STATUS_FLAGS:
+                    break; // TODO
+
+                case BacnetEventTypes.EVENT_CHANGE_OF_RELIABILITY:
+                    break; // TODO
+
+                case BacnetEventTypes.EVENT_CHANGE_OF_DISCRETE_VALUE:
+                    break; // TODO
+
+                case BacnetEventTypes.EVENT_CHANGE_OF_TIMER:
+                    break; // TODO
+
+                default:
+                    return -1;
 
                 default:
                     return false;
