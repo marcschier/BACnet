@@ -417,6 +417,7 @@ namespace System.IO.BACnet
         /* do the max range inside of enum so that
            compilers will allocate adequate sized datatype for enum
            which is used to store decoding */
+        MIN_VENDOR_SPECIFIC_PROPERTY_ID = 512,
         MAX_BACNET_PROPERTY_ID = 4194303
     }
 }

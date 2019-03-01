@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace System.IO.BACnet
 {
-    public struct BacnetReadAccessResult
+    public class BacnetReadAccessResult
     {
         public BacnetObjectId objectIdentifier;
         public IList<BacnetPropertyValue> values;

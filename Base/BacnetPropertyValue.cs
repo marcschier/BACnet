@@ -2,7 +2,8 @@ using System.Collections.Generic;
 
 namespace System.IO.BACnet
 {
-    public struct BacnetPropertyValue
+    // TODO you have been flagged for refactoring due to un-C#-iness
+    public class BacnetPropertyValue
     {
         public BacnetPropertyReference property;
         public IList<BacnetValue> value;
