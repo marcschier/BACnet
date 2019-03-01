@@ -46,6 +46,12 @@ namespace System.IO.BACnet
                 return BacnetApplicationTags.BACNET_APPLICATION_TAG_ERROR;
             if (t == typeof(BacnetDeviceObjectPropertyReference))
                 return BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_PROPERTY_REFERENCE;
+            if (t == typeof(BacnetDailySchedule))
+                return BacnetApplicationTags.BACNET_APPLICATION_TAG_WEEKLY_SCHEDULE;
+            if (t == typeof(BacnetSpecialEvent))
+                return BacnetApplicationTags.BACNET_APPLICATION_TAG_SPECIAL_EVENT;
+            if (t == typeof(BACnetCalendarEntry))
+                return BacnetApplicationTags.BACNET_APPLICATION_TAG_CALENDAR_ENTRY;
             if (t.IsEnum)
                 return BacnetApplicationTags.BACNET_APPLICATION_TAG_ENUMERATED;
 

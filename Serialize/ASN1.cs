@@ -507,6 +507,26 @@ namespace System.IO.BACnet.Serialize
                             throw new ArgumentException($"Unsupported destination value '{value.Value}' (type {value.GetType()})");
                     }
                     break;
+                case BacnetApplicationTags.BACNET_APPLICATION_TAG_WEEKLY_SCHEDULE:
+                    if(value.Value is BacnetDailySchedule daySched )
+                    {
+                        daySched.Encode(buffer);
+                    }
+                    else
+                    {
+                        throw new ArgumentException("value has to be typeof BacnetDailySchedule");
+                    }
+                    break;
+                case BacnetApplicationTags.BACNET_APPLICATION_TAG_SPECIAL_EVENT:
+                    if(value.Value is BacnetSpecialEvent specEvent)
+                    {
+                        specEvent.Encode(buffer);
+                    }
+                    else
+                    {
+                        throw new Exception("value has to be typeof BacnetSpecialEvent");
+                    }
+                    break;
                 default:
                     //context specific
                     if (value.Value is byte[] arr)
@@ -2201,6 +2221,29 @@ namespace System.IO.BACnet.Serialize
                     value.Value = v;
                     return tagLen;
                 }
+                if (propertyId == BacnetPropertyIds.PROP_WEEKLY_SCHEDULE)
+                {
+                    //has to be an array of 7
+                    /*var schedule = new BacnetDailySchedule[7];                    
+                    for (int i = 0; i < 7; i++)
+                    {
+                        schedule[i] = new BacnetDailySchedule();
+                        len += schedule[i].Decode(buffer, offset + len, (uint)maxOffset);
+                    }*/
+                    var schedule = new BacnetDailySchedule();
+                    len += schedule.Decode(buffer, offset + len, (uint)maxOffset);
+                    value.Value = schedule;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_TAG_WEEKLY_SCHEDULE;
+                    return len;
+                }
+                if (propertyId == BacnetPropertyIds.PROP_EXCEPTION_SCHEDULE)
+                {
+                    var excpSched = new BacnetSpecialEvent();
+                    len +=excpSched.Decode(buffer, offset + len, (uint)maxOffset);
+                    value.Value = excpSched;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_TAG_SPECIAL_EVENT;
+                    return len;
+                }
 
                 value.Tag = BacnetApplicationTags.BACNET_APPLICATION_TAG_CONTEXT_SPECIFIC_DECODED;
                 var list = new List<BacnetValue>();
@@ -2615,6 +2658,7 @@ namespace System.IO.BACnet.Serialize
 
             return len + sectionLength;
         }
+        
 
         public static int decode_context_bitstring(byte[] buffer, int offset, byte tagNumber, out BacnetBitString value)
         {
@@ -2712,5 +2756,8 @@ namespace System.IO.BACnet.Serialize
 
             return len;
         }
+
+
+
     }
 }
