@@ -1,4 +1,4 @@
-﻿namespace System.IO.BACnet
+namespace System.IO.BACnet
 {
     public enum BacnetLifeSafetyStates
     {

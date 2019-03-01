@@ -24,5 +24,6 @@
     <PackageReference Include="System.IO.Ports" Version="4.5.0" />
     <PackageReference Include="PacketDotNet" Version="0.19.3" />
     <PackageReference Include="SharpPcap" Version="4.5.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
   </ItemGroup>
 </Project>

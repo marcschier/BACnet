@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.IO.BACnet.Base;
+using System.Text;
 
 namespace System.IO.BACnet.Serialize.Decode
 {
@@ -10,6 +11,7 @@ namespace System.IO.BACnet.Serialize.Decode
 
         public PrimitiveDecoder(NumericDecoder numericDecoder)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _numericDecoder = numericDecoder;
         }
 
@@ -174,6 +176,7 @@ namespace System.IO.BACnet.Serialize.Decode
 
         [Decodes(BacnetPropertyIds.PROP_PRESENT_VALUE, BacnetObjectTypes.OBJECT_ANALOG_INPUT)]
         [Decodes(BacnetPropertyIds.PROP_TRACKING_VALUE, BacnetObjectTypes.OBJECT_ANALOG_INPUT)]
+        [Decodes(BacnetPropertyIds.PROP_PRESENT_VALUE, BacnetObjectTypes.OBJECT_ANALOG_OUTPUT)]
         public virtual Result<float> DecodeReal(Context context, byte? expectedTag = null,
             bool required = true)
         {
@@ -344,6 +347,9 @@ namespace System.IO.BACnet.Serialize.Decode
         [Decodes(BacnetPropertyIds.PROP_SEGMENTATION_SUPPORTED, typeof(BacnetSegmentations))]
         [Decodes(BacnetPropertyIds.PROP_LAST_RESTART_REASON, typeof(BacnetRestartReason))]
         [Decodes(BacnetPropertyIds.PROP_UNITS, typeof(BacnetEngineeringUnits))]
+        [Decodes(BacnetPropertyIds.PROP_POLARITY, typeof(BacnetPolarity))]
+        [Decodes(BacnetPropertyIds.PROP_PRESENT_VALUE, BacnetObjectTypes.OBJECT_BINARY_OUTPUT, typeof(BacnetBinaryPv))]
+        [Decodes(BacnetPropertyIds.PROP_PRESENT_VALUE, BacnetObjectTypes.OBJECT_BINARY_INPUT, typeof(BacnetBinaryPv))]
         public virtual Result<T> DecodeEnumerated<T>(Context context, byte? expectedTag = null,
             bool required = true) where T : struct, IComparable
         {
