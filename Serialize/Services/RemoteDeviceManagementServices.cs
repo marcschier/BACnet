@@ -109,7 +109,7 @@
             if (!ASN1.decode_is_context_tag(buffer, offset + len, 0))
                 return -1;
             len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out var lenValueType);
-            len += EnumUtils.DecodeEnumerated(buffer, offset + len, lenValueType, out state);
+            len += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValueType, out state);
             /* Tag 1: password - optional */
             if (len < apduLen)
             {

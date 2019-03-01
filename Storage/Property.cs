@@ -99,6 +99,8 @@ namespace System.IO.BACnet.Storage
                     return ((double)value.Value).ToString(CultureInfo.InvariantCulture);
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_OCTET_STRING:
                     return Convert.ToBase64String((byte[])value.Value);
+                case BacnetApplicationTags.BACNET_APPLICATION_TAG_ENUMERATED:
+                    return Convert.ToInt32(value.Value).ToString(CultureInfo.InvariantCulture);
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_CONTEXT_SPECIFIC_DECODED:
                 {
                     return value.Value is byte[]

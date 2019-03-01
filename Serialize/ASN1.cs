@@ -2594,63 +2594,63 @@ namespace System.IO.BACnet.Serialize
             {
                 case 0: // bool
                     sectionLength = 1;
-                    value = ChangeOfStateFactory.Create(buffer[offset + len] == 1);
+                    value = ChangeOfState<object>.Create(buffer[offset + len] == 1);
                     break;
 
                 case 1:
-                    value = ChangeOfStateFactory.Create(
-                        EnumUtils.DecodeEnumerated<BacnetBinaryPv>(buffer, offset + len, lenValueType, out sectionLength));
+                    value = ChangeOfState<object>.Create(
+                        EnumClassUtils<Enum>.DecodeEnumerated<BacnetBinaryPv>(buffer, offset + len, lenValueType, out sectionLength));
                     break;
 
                 case 2:
-                    value = ChangeOfStateFactory.Create(
-                        EnumUtils.DecodeEnumerated<BacnetEventTypes>(buffer, offset + len, lenValueType, out sectionLength));
+                    value = ChangeOfState<object>.Create(
+                        EnumClassUtils<Enum>.DecodeEnumerated<BacnetEventTypes>(buffer, offset + len, lenValueType, out sectionLength));
                     break;
                 case 3:
-                    value = ChangeOfStateFactory.Create(
-                        EnumUtils.DecodeEnumerated<BacnetPolarity>(buffer, offset + len, lenValueType, out sectionLength));
+                    value = ChangeOfState<object>.Create(
+                        EnumClassUtils<Enum>.DecodeEnumerated<BacnetPolarity>(buffer, offset + len, lenValueType, out sectionLength));
                     break;
 
                 case 4:
-                    value = ChangeOfStateFactory.Create(
-                        EnumUtils.DecodeEnumerated<BacnetProgramRequest>(buffer, offset + len, lenValueType, out sectionLength));
+                    value = ChangeOfState<object>.Create(
+                        EnumClassUtils<Enum>.DecodeEnumerated<BacnetProgramRequest>(buffer, offset + len, lenValueType, out sectionLength));
                     break;
                 case 5:
-                    value = ChangeOfStateFactory.Create(
-                        EnumUtils.DecodeEnumerated<BacnetProgramState>(buffer, offset + len, lenValueType, out sectionLength));
+                    value = ChangeOfState<object>.Create(
+                        EnumClassUtils<Enum>.DecodeEnumerated<BacnetProgramState>(buffer, offset + len, lenValueType, out sectionLength));
                     break;
                 case 6:
-                    value = ChangeOfStateFactory.Create(
-                        EnumUtils.DecodeEnumerated<BacnetProgramError>(buffer, offset + len, lenValueType, out sectionLength));
+                    value = ChangeOfState<object>.Create(
+                        EnumClassUtils<Enum>.DecodeEnumerated<BacnetProgramError>(buffer, offset + len, lenValueType, out sectionLength));
                     break;
                 case 7:
-                    value = ChangeOfStateFactory.Create(
-                        EnumUtils.DecodeEnumerated<BacnetReliability>(buffer, offset + len, lenValueType, out sectionLength));
+                    value = ChangeOfState<object>.Create(
+                        EnumClassUtils<Enum>.DecodeEnumerated<BacnetReliability>(buffer, offset + len, lenValueType, out sectionLength));
                     break;
                 case 8:
-                    value = ChangeOfStateFactory.Create(
-                        EnumUtils.DecodeEnumerated<BacnetEventStates>(buffer, offset + len, lenValueType, out sectionLength));
+                    value = ChangeOfState<object>.Create(
+                        EnumClassUtils<Enum>.DecodeEnumerated<BacnetEventStates>(buffer, offset + len, lenValueType, out sectionLength));
                     break;
 
                 case 9:
-                    value = ChangeOfStateFactory.Create(
-                        EnumUtils.DecodeEnumerated<BacnetDeviceStatus>(buffer, offset + len, lenValueType, out sectionLength));
+                    value = ChangeOfState<object>.Create(
+                        EnumClassUtils<Enum>.DecodeEnumerated<BacnetDeviceStatus>(buffer, offset + len, lenValueType, out sectionLength));
                     break;
                 case 10:
-                    value = ChangeOfStateFactory.Create(
-                        EnumUtils.DecodeEnumerated<BacnetUnitsId>(buffer, offset + len, lenValueType, out sectionLength));
+                    value = ChangeOfState<object>.Create(
+                        EnumClassUtils<Enum>.DecodeEnumerated<BacnetUnitsId>(buffer, offset + len, lenValueType, out sectionLength));
                     break;
                 case 11:
-                    value = ChangeOfStateFactory.Create(decode_unsigned(buffer, offset + len, lenValueType, out sectionLength));
+                    value = ChangeOfState<object>.Create(decode_unsigned(buffer, offset + len, lenValueType, out sectionLength));
                     break;
 
                 case 12:
-                    value = ChangeOfStateFactory.Create(
-                        EnumUtils.DecodeEnumerated<BacnetLifeSafetyModes>(buffer, offset + len, lenValueType, out sectionLength));
+                    value = ChangeOfState<object>.Create(
+                        EnumClassUtils<Enum>.DecodeEnumerated<BacnetLifeSafetyModes>(buffer, offset + len, lenValueType, out sectionLength));
                     break;
                 case 13:
-                    value = ChangeOfStateFactory.Create(
-                        EnumUtils.DecodeEnumerated<BacnetLifeSafetyStates>(buffer, offset + len, lenValueType, out sectionLength));
+                    value = ChangeOfState<object>.Create(
+                        EnumClassUtils<Enum>.DecodeEnumerated<BacnetLifeSafetyStates>(buffer, offset + len, lenValueType, out sectionLength));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"tag {tag} is not supported");
@@ -2731,10 +2731,10 @@ namespace System.IO.BACnet.Serialize
 
             offset += decode_tag_number_and_value(buffer, offset, out _, out var lenValueType);
             /* FIXME: we could validate that the tag is enumerated... */
-            offset += EnumUtils.DecodeEnumerated(buffer, offset, lenValueType, out errorClass);
+            offset += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset, lenValueType, out errorClass);
             offset += decode_tag_number_and_value(buffer, offset, out _, out lenValueType);
             /* FIXME: we could validate that the tag is enumerated... */
-            offset += EnumUtils.DecodeEnumerated(buffer, offset, lenValueType, out errorCode);
+            offset += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset, lenValueType, out errorCode);
 
             return offset - orgOffset;
         }

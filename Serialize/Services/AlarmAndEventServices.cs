@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO.BACnet.EventNotification;
 using System.IO.BACnet.EventNotification.EventValues;
 using System.Linq;
@@ -406,7 +406,7 @@ namespace System.IO.BACnet.Serialize
             if (ASN1.decode_is_context_tag(buffer, offset + len, 6))
             {
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out lenValue);
-                len += EnumUtils.DecodeEnumerated(buffer, offset + len, lenValue, out BacnetEventTypes eventTypeValue);
+                len += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValue, out BacnetEventTypes eventTypeValue);
                 eventType = eventTypeValue;
             }
             //else
@@ -425,7 +425,7 @@ namespace System.IO.BACnet.Serialize
             if (ASN1.decode_is_context_tag(buffer, offset + len, 8))
             {
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out lenValue);
-                len += EnumUtils.DecodeEnumerated(buffer, offset + len, lenValue, out BacnetNotifyTypes notifyTypeValue);
+                len += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValue, out BacnetNotifyTypes notifyTypeValue);
                 decodedStateTransition.Add(e => e.NotifyType = notifyTypeValue);
                 notifyType = notifyTypeValue;
             }
@@ -524,12 +524,12 @@ namespace System.IO.BACnet.Serialize
                     if (ASN1.decode_is_context_tag(buffer, offset + len, (byte)BacnetCOVTypes.CHANGE_OF_VALUE_BITS))
                     {
                         len += ASN1.decode_context_bitstring(buffer, offset + len, 0, out var changedBits);
-                        eventValues = ChangeOfValueFactory.Create(changedBits);
+                        eventValues = ChangeOfValue<object>.Create(changedBits);
                     }
                     else if (ASN1.decode_is_context_tag(buffer, offset + len, (byte)BacnetCOVTypes.CHANGE_OF_VALUE_REAL))
                     {
                         len += ASN1.decode_context_real(buffer, offset + len, 1, out var changeValue);
-                        eventValues = ChangeOfValueFactory.Create(changeValue);
+                        eventValues = ChangeOfValue<object>.Create(changeValue);
                     }
                     else
                     {
@@ -573,10 +573,10 @@ namespace System.IO.BACnet.Serialize
                     break;
 
                 case BacnetEventTypes.EVENT_CHANGE_OF_LIFE_SAFETY:
-                    len += EnumUtils.DecodeContextEnumerated(buffer, offset + len, 0, out BacnetLifeSafetyStates lifeSafetyNewState);
-                    len += EnumUtils.DecodeContextEnumerated(buffer, offset + len, 1, out BacnetLifeSafetyModes lifeSafetyNewMode);
+                    len += EnumClassUtils<Enum>.DecodeContextEnumerated(buffer, offset + len, 0, out BacnetLifeSafetyStates lifeSafetyNewState);
+                    len += EnumClassUtils<Enum>.DecodeContextEnumerated(buffer, offset + len, 1, out BacnetLifeSafetyModes lifeSafetyNewMode);
                     len += ASN1.decode_context_bitstring(buffer, offset + len, 2, out var lifeSafetyStatusFlags);
-                    len += EnumUtils.DecodeContextEnumerated(buffer, offset + len, 3, out BacnetLifeSafetyOperations operationExpected);
+                    len += EnumClassUtils<Enum>.DecodeContextEnumerated(buffer, offset + len, 3, out BacnetLifeSafetyOperations operationExpected);
                     eventValues = new ChangeOfLifeSafety
                     {
                         NewState = lifeSafetyNewState,
@@ -609,6 +609,71 @@ namespace System.IO.BACnet.Serialize
                         ExceededLimit = unsignedRangeExceededLimit
                     };
                     break;
+
+                case BacnetEventTypes.EVENT_ACCESS_EVENT:
+                    break; // TODO
+
+                case BacnetEventTypes.EVENT_DOUBLE_OUT_OF_RANGE:
+                    len += ASN1.decode_context_double(buffer, offset + len, 0, out var doubleOutOfRange_exceedingValue);
+                    len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out var doubleOutOfRange_statusFlags);
+                    len += ASN1.decode_context_double(buffer, offset + len, 2, out var doubleOutOfRange_deadband);
+                    len += ASN1.decode_context_double(buffer, offset + len, 3, out var doubleOutOfRange_exceededLimit);
+                    eventValues = new DoubleOutOfRange {
+                        ExceedingValue = doubleOutOfRange_exceedingValue,
+                        StatusFlags = doubleOutOfRange_statusFlags,
+                        Deadband = doubleOutOfRange_deadband,
+                        ExceededLimit = doubleOutOfRange_exceededLimit
+                    };
+                    break;
+
+                case BacnetEventTypes.EVENT_SIGNED_OUT_OF_RANGE:
+                    len += ASN1.decode_context_signed(buffer, offset + len, 0, out var signedOutOfRange_exceedingValue);
+                    len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out var signedOutOfRange_statusFlags);
+                    len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out var signedOutOfRange_deadband);
+                    len += ASN1.decode_context_signed(buffer, offset + len, 3, out var signedOutOfRange_exceededLimit);
+                    eventValues = new SignedOutOfRange {
+                        ExceedingValue = signedOutOfRange_exceedingValue,
+                        StatusFlags = signedOutOfRange_statusFlags,
+                        Deadband = signedOutOfRange_deadband,
+                        ExceededLimit = signedOutOfRange_exceededLimit
+                    };
+                    break;
+
+                case BacnetEventTypes.EVENT_UNSIGNED_OUT_OF_RANGE:
+                    len += ASN1.decode_context_unsigned(buffer, offset + len, 0, out var unsignedOutOfRange_exceedingValue);
+                    len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out var unsignedOutOfRange_statusFlags);
+                    len += ASN1.decode_context_unsigned(buffer, offset + len, 2, out var unsignedOutOfRange_deadband);
+                    len += ASN1.decode_context_unsigned(buffer, offset + len, 3, out var unsignedOutOfRange_exceededLimit);
+                    eventValues = new UnsignedOutOfRange {
+                        ExceedingValue = unsignedOutOfRange_exceedingValue,
+                        StatusFlags = unsignedOutOfRange_statusFlags,
+                        Deadband = unsignedOutOfRange_deadband,
+                        ExceededLimit = unsignedOutOfRange_exceededLimit
+                    };
+                    break;
+
+                case BacnetEventTypes.EVENT_CHANGE_OF_CHARACTER_STRING:
+                    len += ASN1.decode_context_character_string(buffer, offset + len, 20000, 0, out var changeOfCharacterString_changedValue);
+                    len += ASN1.decode_context_bitstring(buffer, offset + len, 1, out var changeOfCharacterString_statusFlags);
+                    len += ASN1.decode_context_character_string(buffer, offset + len, 20000, 2, out var changeOfCharacterString_alarmValue);
+                    eventValues = new ChangeOfCharacterString {
+                        ChangedValue = changeOfCharacterString_changedValue,
+                        StatusFlags = changeOfCharacterString_statusFlags,
+                        AlarmValue = changeOfCharacterString_alarmValue
+                    };
+                    break;
+
+                case BacnetEventTypes.EVENT_CHANGE_OF_STATUS_FLAGS:
+                    break; // TODO
+
+                case BacnetEventTypes.EVENT_CHANGE_OF_RELIABILITY:
+                    break; // TODO
+
+                case BacnetEventTypes.EVENT_CHANGE_OF_DISCRETE_VALUE:
+                    break; // TODO
+
+                case BacnetEventTypes.EVENT_CHANGE_OF_TIMER:
+                    break; // TODO
 
                 default:
                     throw new ArgumentOutOfRangeException($"Event-Type {eventType} is not supported");
@@ -644,7 +709,7 @@ namespace System.IO.BACnet.Serialize
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out var tagNumber, out var lenValue);
                 len += ASN1.decode_object_id(buffer, offset + len, out BacnetObjectTypes type, out var instance);
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
-                len += EnumUtils.DecodeEnumerated(buffer, offset + len, lenValue, out BacnetEventStates alarmState);
+                len += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValue, out BacnetEventStates alarmState);
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
                 len += ASN1.decode_bitstring(buffer, offset + len, lenValue, out var acknowledgedTransitions);
 
@@ -713,7 +778,7 @@ namespace System.IO.BACnet.Serialize
                 value.objectIdentifier = new BacnetObjectId(type, instance);
 
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
-                len += EnumUtils.DecodeEnumerated(buffer, offset + len, lenValue, out value.eventState);
+                len += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValue, out value.eventState);
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
                 len += ASN1.decode_bitstring(buffer, offset + len, lenValue, out value.acknowledgedTransitions);
 
@@ -729,7 +794,7 @@ namespace System.IO.BACnet.Serialize
                 len++;  // closing Tag 3
 
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
-                len += EnumUtils.DecodeEnumerated(buffer, offset + len, lenValue, out value.notifyType);
+                len += EnumClassUtils<Enum>.DecodeEnumerated(buffer, offset + len, lenValue, out value.notifyType);
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
                 len += ASN1.decode_bitstring(buffer, offset + len, lenValue, out value.eventEnable);
 

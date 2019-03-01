@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO.BACnet.Serialize;
 using System.Linq;
@@ -37,8 +37,7 @@ namespace System.IO.BACnet
                     len += 1; // -> closingtag
                     break;
                 case 1: //calendarReference
-                    var calRef = new BacnetObjectId();
-                    len +=ASN1.decode_object_id(buffer, offset + len, out calRef.type, out calRef.instance);
+                    len += ASN1.decode_object_id(buffer, offset + len, out var calRef);
                     Period = calRef;
                     break;
             }

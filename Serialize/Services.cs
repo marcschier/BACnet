@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO.BACnet.EventNotification;
 using System.IO.BACnet.EventNotification.EventValues;
 using System.Linq;
-
 namespace System.IO.BACnet.Serialize
 {
     public class Services
     {
-        public static void EncodeIamBroadcast(EncodeBuffer buffer, uint deviceId, uint maxApdu, BacnetSegmentations segmentation, ushort vendorId)
+#if FALSE
+       public static void EncodeIamBroadcast(EncodeBuffer buffer, uint deviceId, uint maxApdu, BacnetSegmentations segmentation, ushort vendorId)
         {
             ASN1.encode_application_object_id(buffer, BacnetObjectTypes.OBJECT_DEVICE, deviceId);
             ASN1.encode_application_unsigned(buffer, maxApdu);
@@ -2509,6 +2509,7 @@ namespace System.IO.BACnet.Serialize
 
             return len;
         }
+#endif
 
         public static void EncodeError(EncodeBuffer buffer, BacnetErrorClasses errorClass, BacnetErrorCodes errorCode)
         {
@@ -2654,7 +2655,7 @@ namespace System.IO.BACnet.Serialize
                         break;
 
                     case BacnetTrendLogValueType.TL_TYPE_ENUM:
-                        len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out var eval);
+                        len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out uint eval);
                         records[curveNumber].Value = eval;
                         break;
 
@@ -2664,7 +2665,7 @@ namespace System.IO.BACnet.Serialize
                         break;
 
                     case BacnetTrendLogValueType.TL_TYPE_UNSIGN:
-                        len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out var uinval);
+                        len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out uint uinval);
                         records[curveNumber].Value = uinval;
                         break;
 

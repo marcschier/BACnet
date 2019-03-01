@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.BACnet.EventNotification;
 using System.IO.BACnet.Serialize;
@@ -1936,7 +1936,7 @@ namespace System.IO.BACnet
                 }
                 catch (Exception e)
                 {
-                    throw new Exception(exceptionMessage, e);
+                    throw new BacnetException(exceptionMessage, e);
                 }
             });
         }

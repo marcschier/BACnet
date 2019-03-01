@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO.BACnet.Serialize;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
@@ -359,10 +360,11 @@ namespace System.IO.BACnet.Storage
             return errorcode;
         }
 
-        public ErrorCodes[] WritePropertyMultiple(BacnetObjectId objectId, ICollection<BacnetPropertyValue> values)
+        public ErrorCodes[] WritePropertyMultiple(IEnumerable<BacnetWriteAccessSpecification> values)
         {
             return values
-                .Select(v => WriteProperty(objectId, (BacnetPropertyIds)v.property.propertyIdentifier, v.property.propertyArrayIndex, v.value))
+                .SelectMany(v => v.Properties.Select(property => (v.ObjectId, property)))
+                .Select(v => WriteProperty(v.ObjectId, v.property.Id, v.property.ArrayIndex ?? ASN1.BACNET_ARRAY_ALL, new List<BacnetValue> { v.property.Value }))
                 .ToArray();
         }
 
